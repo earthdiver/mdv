@@ -1,0 +1,148 @@
+<Window x:Class="Mdv.App.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:wv="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+ Title="MDV — Markdown Viewer" Width="1280" Height="860" MinWidth="840" MinHeight="560"
+ WindowStartupLocation="CenterScreen" AllowDrop="True" Loaded="Window_Loaded" Closing="Window_Closing"
+ PreviewDragOver="Window_DragOver" PreviewDrop="Window_Drop" PreviewKeyDown="Window_KeyDown">
+ <DockPanel LastChildFill="True">
+  <Menu DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" Foreground="{DynamicResource TextBrush}" Padding="8,2">
+   <MenuItem Header="ファイル(_F)">
+    <MenuItem x:Name="NewTabMenu" Header="新しいタブ(_T)" InputGestureText="Ctrl+T" Click="NewTab_Click" />
+    <MenuItem Header="開く(_O)…" InputGestureText="Ctrl+O" Click="Open_Click" />
+    <MenuItem x:Name="RecentMenu" Header="最近開いたファイル(_R)" />
+    <MenuItem Header="再読み込み(_R)" InputGestureText="F5" Click="Reload_Click" />
+    <MenuItem x:Name="CloseTabMenu" Header="タブを閉じる(_W)" InputGestureText="Ctrl+W" Click="CloseCurrentTab_Click" />
+    <Separator />
+    <MenuItem x:Name="PrintMenu" Header="印刷(_P)…" InputGestureText="Ctrl+P" Click="Print_Click" />
+    <MenuItem x:Name="PdfMenu" Header="PDFに保存(_E)…" Click="Pdf_Click" />
+    <Separator /><MenuItem Header="終了(_X)" InputGestureText="Alt+F4" Click="Exit_Click" />
+   </MenuItem>
+   <MenuItem Header="表示(_V)">
+    <MenuItem x:Name="BackMenu" Header="戻る(_B)" InputGestureText="Alt+←" IsEnabled="False" Click="Back_Click" />
+    <MenuItem x:Name="ForwardMenu" Header="進む(_N)" InputGestureText="Alt+→" IsEnabled="False" Click="Forward_Click" />
+    <MenuItem Header="次のタブ" InputGestureText="Ctrl+Tab" Click="NextTab_Click" />
+    <MenuItem Header="前のタブ" InputGestureText="Ctrl+Shift+Tab" Click="PreviousTab_Click" />
+    <Separator />
+    <MenuItem Header="文書内を検索(_F)" InputGestureText="Ctrl+F" Click="Find_Click" />
+    <MenuItem x:Name="OutlineMenu" Header="目次(_T)" IsCheckable="True" Click="Outline_Click" />
+    <MenuItem x:Name="SourceMenu" Header="ソースを表示(_S)" IsCheckable="True" InputGestureText="Ctrl+U" Click="Source_Click" />
+    <Separator />
+    <MenuItem x:Name="DarkMenu" Header="ダークテーマ(_D)" IsCheckable="True" Click="Theme_Click" />
+    <MenuItem x:Name="RemoteImagesMenu" Header="外部画像を読み込む(_I)" IsCheckable="True" Click="RemoteImages_Click" />
+    <Separator />
+    <MenuItem Header="拡大" InputGestureText="Ctrl++" Click="ZoomIn_Click" />
+    <MenuItem Header="縮小" InputGestureText="Ctrl+-" Click="ZoomOut_Click" />
+    <MenuItem Header="標準の倍率" InputGestureText="Ctrl+0" Click="ZoomReset_Click" />
+   </MenuItem>
+   <MenuItem Header="ヘルプ(_H)">
+    <MenuItem Header="サンプルを開く" Click="Sample_Click" />
+    <MenuItem Header="互換性・対応範囲" Click="Compatibility_Click" />
+    <MenuItem Header="MDVについて" Click="About_Click" />
+    <MenuItem Header="同梱ライセンス" Click="Licenses_Click" />
+   </MenuItem>
+  </Menu>
+  <Border DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="20,16">
+   <Grid>
+    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+    <StackPanel Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+     <Button x:Name="BackButton" Content="←" FontSize="20" Width="38" Padding="0,4" IsEnabled="False" Click="Back_Click" ToolTip="戻る (Alt+←)" AutomationProperties.Name="戻る" />
+     <Button x:Name="ForwardButton" Content="→" FontSize="20" Width="38" Padding="0,4" IsEnabled="False" Click="Forward_Click" ToolTip="進む (Alt+→)" AutomationProperties.Name="進む" />
+    </StackPanel>
+    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,16,0">
+     <TextBlock x:Name="FileTitle" Text="MDV" FontSize="17" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+     <TextBlock x:Name="FileSubtitle" Text="GitHub / Qiita Markdown Viewer" FontSize="11" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" Margin="0,3,0,0" />
+    </StackPanel>
+    <Border Grid.Column="2" Background="{DynamicResource WindowBrush}" CornerRadius="6" Padding="3" Margin="0,0,16,0" VerticalAlignment="Center">
+     <StackPanel Orientation="Horizontal">
+      <RadioButton x:Name="GithubMode" Content="GitHub" GroupName="Mode" Style="{StaticResource ModeButton}" Tag="github" Checked="Mode_Checked" ToolTip="GitHub形式 (Ctrl+1)" AutomationProperties.AutomationId="ModeGitHub" />
+      <RadioButton x:Name="QiitaMode" Content="Qiita" GroupName="Mode" Style="{StaticResource ModeButton}" Tag="qiita" Checked="Mode_Checked" ToolTip="Qiita形式 (Ctrl+2)" AutomationProperties.AutomationId="ModeQiita" />
+     </StackPanel>
+    </Border>
+    <Button Grid.Column="3" Content="ファイルを開く" Click="Open_Click" VerticalAlignment="Center" ToolTip="Ctrl+O / ファイルをドロップ" AutomationProperties.AutomationId="OpenFile" />
+   </Grid>
+  </Border>
+  <Border DockPanel.Dock="Top" Background="{DynamicResource WindowBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+   <DockPanel LastChildFill="True" Margin="10,0">
+    <Button x:Name="NewTabButton" DockPanel.Dock="Right" Content="＋" Width="32" Height="30" Padding="0" Margin="6,4" Click="NewTab_Click" ToolTip="新しいタブ (Ctrl+T)" AutomationProperties.Name="新しいタブ" />
+    <ListBox x:Name="DocumentTabs" SelectionMode="Single" SelectionChanged="Tabs_SelectionChanged" Padding="0" Background="Transparent" BorderThickness="0"
+             ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" AutomationProperties.Name="開いている文書のタブ">
+     <ListBox.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ListBox.ItemsPanel>
+     <ListBox.ItemContainerStyle>
+      <Style TargetType="ListBoxItem">
+       <Setter Property="ToolTip" Value="{Binding FilePath}" />
+       <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
+       <EventSetter Event="PreviewMouseDown" Handler="Tab_MouseDown" />
+       <Setter Property="Template"><Setter.Value>
+        <ControlTemplate TargetType="ListBoxItem">
+         <Border x:Name="TabFrame" Padding="12,7,8,5" BorderThickness="0,0,0,2" BorderBrush="Transparent" Background="Transparent">
+          <ContentPresenter />
+         </Border>
+         <ControlTemplate.Triggers>
+          <Trigger Property="IsSelected" Value="True"><Setter TargetName="TabFrame" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /><Setter TargetName="TabFrame" Property="Background" Value="{DynamicResource PanelBrush}" /></Trigger>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="TabFrame" Property="Background" Value="{DynamicResource SelectionBrush}" /></Trigger>
+          <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="TabFrame" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger>
+         </ControlTemplate.Triggers>
+        </ControlTemplate>
+       </Setter.Value></Setter>
+      </Style>
+     </ListBox.ItemContainerStyle>
+     <ListBox.ItemTemplate>
+      <DataTemplate>
+       <StackPanel Orientation="Horizontal">
+        <TextBlock Text="{Binding Title}" Width="154" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+        <Button Content="×" Width="22" Height="22" FontSize="16" Padding="0" Margin="8,0,0,0" Click="CloseTab_Click" ToolTip="タブを閉じる (Ctrl+W)" AutomationProperties.Name="タブを閉じる" />
+       </StackPanel>
+      </DataTemplate>
+     </ListBox.ItemTemplate>
+    </ListBox>
+   </DockPanel>
+  </Border>
+  <Border x:Name="FindBar" DockPanel.Dock="Top" Visibility="Collapsed" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="16,8">
+   <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+    <TextBlock Text="検索" VerticalAlignment="Center" Margin="0,0,8,0" />
+    <TextBox x:Name="FindInput" Width="260" Padding="8,4" TextChanged="FindInput_Changed" KeyDown="FindInput_KeyDown" AutomationProperties.Name="文書内の検索語" />
+    <TextBlock x:Name="FindCount" Text="0 / 0" Width="90" TextAlignment="Center" VerticalAlignment="Center" />
+    <Button Content="前へ" Click="FindPrevious_Click" /><Button Content="次へ" Click="FindNext_Click" /><Button Content="閉じる" Click="FindClose_Click" />
+   </StackPanel>
+  </Border>
+  <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Background="{DynamicResource PanelBrush}" Padding="14,7">
+   <Grid>
+    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+    <TextBlock x:Name="StatusText" Text="起動中…" Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+    <TextBlock x:Name="FileStats" Grid.Column="1" Foreground="{DynamicResource MutedBrush}" Margin="16,0" VerticalAlignment="Center" />
+    <Button x:Name="DiagnosticsButton" Grid.Column="2" Content="対応範囲" Padding="8,2" Click="Compatibility_Click" />
+    <TextBlock x:Name="ZoomLabel" Grid.Column="3" Text="100%" Width="52" TextAlignment="Right" VerticalAlignment="Center" />
+   </Grid>
+  </Border>
+  <Grid>
+   <Grid.ColumnDefinitions><ColumnDefinition x:Name="OutlineColumn" Width="230" MinWidth="0" /><ColumnDefinition x:Name="SourceColumn" Width="0" MinWidth="0" /><ColumnDefinition x:Name="SplitterColumn" Width="0" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+   <Border x:Name="OutlinePanel" Grid.Column="0" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+    <DockPanel Margin="10,18,10,10">
+     <StackPanel DockPanel.Dock="Top" Margin="12,0,0,14"><TextBlock Text="目次" FontSize="12" FontWeight="SemiBold" /><TextBlock x:Name="HeadingCount" Text="見出しから移動できます" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,5,0,0" /></StackPanel>
+     <ListBox x:Name="OutlineList" SelectionChanged="Outline_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="目次">
+      <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Text}" Margin="{Binding Indent}" Padding="2,6" TextWrapping="Wrap" FontSize="12" /></DataTemplate></ListBox.ItemTemplate>
+     </ListBox>
+    </DockPanel>
+   </Border>
+   <DockPanel x:Name="SourcePanel" Grid.Column="1" Visibility="Collapsed">
+    <TextBlock DockPanel.Dock="Top" Text="MARKDOWN ソース · 読み取り専用" FontSize="10" Foreground="{DynamicResource MutedBrush}" Margin="14,10" />
+    <TextBox x:Name="SourceText" IsReadOnly="True" AcceptsReturn="True" AcceptsTab="True" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" FontFamily="Cascadia Code, Consolas" FontSize="13" Padding="16" BorderThickness="0" AutomationProperties.Name="Markdownソース" />
+   </DockPanel>
+   <GridSplitter Grid.Column="2" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" ResizeBehavior="PreviousAndNext" />
+   <Grid Grid.Column="3" Background="{DynamicResource PanelBrush}">
+    <wv:WebView2 x:Name="Preview" AllowDrop="True" />
+    <Border x:Name="EmptyPanel" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="30">
+     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+      <TextBlock Text="新しいタブ" FontSize="24" FontWeight="SemiBold" HorizontalAlignment="Center" />
+      <TextBlock Text="Markdownファイルを開くか、ここにドロップしてください。" Foreground="{DynamicResource MutedBrush}" Margin="0,12,0,20" TextWrapping="Wrap" TextAlignment="Center" />
+      <Button Content="ファイルを開く" Click="Open_Click" HorizontalAlignment="Center" ToolTip="Ctrl+O（複数選択できます）" />
+     </StackPanel>
+    </Border>
+    <Border x:Name="ErrorPanel" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="40">
+     <StackPanel VerticalAlignment="Center"><TextBlock Text="プレビューを開始できませんでした" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,16" /><TextBlock x:Name="ErrorText" TextWrapping="Wrap" /></StackPanel>
+    </Border>
+   </Grid>
+  </Grid>
+ </DockPanel>
+</Window>

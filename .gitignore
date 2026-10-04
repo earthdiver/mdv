@@ -1,0 +1,13 @@
+**/bin/
+**/obj/
+node_modules/
+src/Mdv.App/Renderer/
+src/Mdv.App/PortablePayload/
+MDV.ini
+*.ini.*.tmp
+artifacts/
+test-results/
+playwright-report/
+.vs/
+*.user
+*.suo

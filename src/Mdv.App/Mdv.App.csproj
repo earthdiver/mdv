@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>MDV</AssemblyName>
+    <RootNamespace>Mdv.App</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>0.1.0</Version>
+    <Description>GitHub / Qiita Markdown Viewer for Windows</Description>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PortableBuild)' == 'true'">
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Mdv.Core/Mdv.Core.csproj" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4258.31" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(PortableBuild)' != 'true'">
+    <Content Include="Renderer/**/*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../../samples/**/*" Link="Samples/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(PortableBuild)' == 'true'">
+    <EmbeddedResource Include="PortablePayload/payload.br" LogicalName="Mdv.PortablePayload.br" />
+    <EmbeddedResource Include="PortablePayload/payload.sha256" LogicalName="Mdv.PortablePayload.sha256" />
+  </ItemGroup>
+  <Target Name="VerifyRenderer" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('Renderer/index.html')" Text="Renderer assets are missing. Run npm ci and npm run build from the repository root." />
+    <Error Condition="'$(PortableBuild)' == 'true' And !Exists('PortablePayload/payload.br')" Text="Portable payload is missing. Run scripts/build.ps1 to prepare the runtime and assets." />
+  </Target>
+</Project>

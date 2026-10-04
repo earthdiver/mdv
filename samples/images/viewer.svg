@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="110" viewBox="0 0 880 110">
+ <rect width="880" height="110" rx="12" fill="#f3f6f9"/>
+ <path d="M44 33h44v44H44z" fill="#0969da" rx="6"/>
+ <path d="M53 64V46l7 9 7-9v18m7-7 6 7 6-7m-6-13v20" stroke="#fff" stroke-width="3" fill="none"/>
+ <text x="113" y="51" font-family="Segoe UI,Arial,sans-serif" font-size="20" font-weight="600" fill="#1f2328">Two formats. One quiet place to read.</text>
+ <text x="114" y="78" font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#656d76">GITHUB + QIITA  /  LOCAL FILES  /  WINDOWS</text>
+</svg>

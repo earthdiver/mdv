@@ -1,0 +1,60 @@
+<Application x:Class="Mdv.App.App"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <Application.Resources>
+  <SolidColorBrush x:Key="WindowBrush" Color="#F6F8FA" />
+  <SolidColorBrush x:Key="PanelBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="TextBrush" Color="#1F2328" />
+  <SolidColorBrush x:Key="MutedBrush" Color="#656D76" />
+  <SolidColorBrush x:Key="BorderBrush" Color="#D1D9E0" />
+  <SolidColorBrush x:Key="AccentBrush" Color="#0969DA" />
+  <SolidColorBrush x:Key="SelectionBrush" Color="#DDF4FF" />
+  <Style TargetType="Window">
+   <Setter Property="FontFamily" Value="Segoe UI, Yu Gothic UI" />
+   <Setter Property="FontSize" Value="13" />
+   <Setter Property="Background" Value="{DynamicResource WindowBrush}" />
+   <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+  </Style>
+  <Style TargetType="Button">
+   <Setter Property="Padding" Value="13,7" />
+   <Setter Property="Margin" Value="3,0" />
+   <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+   <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
+   <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+   <Setter Property="Cursor" Value="Hand" />
+   <Setter Property="Template"><Setter.Value>
+    <ControlTemplate TargetType="Button">
+     <Border x:Name="Frame" CornerRadius="5" BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+      <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
+     </Border>
+     <ControlTemplate.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="Background" Value="{DynamicResource SelectionBrush}" /></Trigger>
+      <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45" /></Trigger>
+     </ControlTemplate.Triggers>
+    </ControlTemplate>
+   </Setter.Value></Setter>
+  </Style>
+  <Style x:Key="ModeButton" TargetType="RadioButton">
+   <Setter Property="Padding" Value="18,8" /><Setter Property="Cursor" Value="Hand" />
+   <Setter Property="Foreground" Value="{DynamicResource MutedBrush}" />
+   <Setter Property="Template"><Setter.Value>
+    <ControlTemplate TargetType="RadioButton">
+     <Border x:Name="Frame" Background="Transparent" CornerRadius="5" Padding="{TemplateBinding Padding}" BorderThickness="1" BorderBrush="Transparent">
+      <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+     </Border>
+     <ControlTemplate.Triggers>
+      <Trigger Property="IsChecked" Value="True"><Setter TargetName="Frame" Property="Background" Value="{DynamicResource PanelBrush}" /><Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource BorderBrush}" /><Setter Property="Foreground" Value="{DynamicResource AccentBrush}" /><Setter Property="FontWeight" Value="SemiBold" /></Trigger>
+      <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource AccentBrush}" /></Trigger>
+     </ControlTemplate.Triggers>
+    </ControlTemplate>
+   </Setter.Value></Setter>
+  </Style>
+  <Style TargetType="TextBox">
+   <Setter Property="Foreground" Value="{DynamicResource TextBrush}" /><Setter Property="Background" Value="{DynamicResource PanelBrush}" /><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" /><Setter Property="CaretBrush" Value="{DynamicResource TextBrush}" />
+  </Style>
+  <Style TargetType="ListBox">
+   <Setter Property="Foreground" Value="{DynamicResource TextBrush}" /><Setter Property="Background" Value="{DynamicResource PanelBrush}" /><Setter Property="BorderThickness" Value="0" />
+  </Style>
+ </Application.Resources>
+</Application>
